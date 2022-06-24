@@ -1,0 +1,150 @@
+//List & Forward List with advance iterator examples
+#include <iostream>
+#include <list>
+#include <algorithm>
+#include <string>
+#include <iterator> //for std::advance
+
+class Person {
+	friend std::ostream& operator<< (std::ostream& os, const Person& p);
+	std::string name;
+	int age;
+public:
+	Person() : name{ "unknown" }, age{ 0 } {} //to allow default values to be seen in debugger
+	Person(std::string name, int age)
+		: name{ name }, age{ age } {}
+	bool operator< (const Person& rhs) const {
+		return this->age < rhs.age;
+	}
+	bool operator==(const Person& rhs) const {
+		return (this->name == rhs.name && this->age == rhs.age);
+	}
+};
+
+std::ostream& operator<< (std::ostream& os, const Person& p) {
+	os << p.name << ": " << p.age;
+	return os;
+}
+
+template <typename T>
+void display(const std::list<T>& l) {
+	std::cout << "[ ";
+	for (const auto& elem : l) {
+		std::cout << elem << " ";
+	}
+	std::cout << "]" << std::endl;
+}
+
+void test1() {
+	std::cout << "\n====Test 1=====" << std::endl;
+	std::list<int> l1{ 1,2,3,4,5 };
+	display(l1);
+	std::list<std::string> l2;
+	l2.push_back("Back");
+	l2.push_front("Front");
+	display(l2);
+	std::list <int> l3;
+	l3 = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	display(l3);
+	std::list<int> l4(10, 100);     //creates a list of ten 100s
+	display(l4);
+}
+
+		//front & back and .clear
+void test2() {
+	std::cout << "\n====Test 2=====" << std::endl;
+	std::list <int> l{ 1,2,3,4,5,6,7,8,9,10 };
+	display(l);
+	std::cout << "Size: " << l.size() << std::endl;
+	std::cout << "Front: " << l.front() << std::endl;
+	std::cout << "Back: " << l.back() << std::endl;
+	l.clear();
+	display(l);
+	std::cout << "Size: (after clear) " << l.size() << std::endl;
+}
+
+		//.resize and class obj list
+void test3() {
+	std::cout << "\n====Test 2=====" << std::endl;
+	std::list<int> l{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+	display(l);
+	l.resize(5);
+	display(l);
+	l.resize(10);
+	display(l);
+	std::list<Person> persons;
+	persons.resize(5);            //uses default constructor with unknown & 0
+	display(persons);
+}
+
+		// iterator for .find
+void test4() {
+	std::cout << "\n=====Test 4=====" << std::endl;
+	std::list<int> l{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	display(l);
+	auto it = std::find(l.begin(), l.end(), 5);    //it iterator for use with .find
+	if (it != l.end()) {
+		std::cout << "5 was found." << std::endl;
+	}
+	else {
+		std::cout << "5 was not found." << std::endl;
+	}
+	if (it != l.end()) {
+		l.insert(it, 100);				//inserts 100 before the 5
+	}
+	display(l);
+	std::list<int> l2{ 1000,2000,3000 };
+	l.insert(it, l2.begin(), l2.end());
+	display(l);
+	std::advance(it, -4);      //points to the 100 #include <iterator>
+	std::cout << *it << std::endl;
+	l.erase(it);
+	display(l);
+ }
+
+		//uses std::find .emplace and iterators
+void test5() {
+	std::cout << "\n==== = Test 5==== = " << std::endl;
+	std::list<Person> account_users{
+		{"Jenny",19},
+		{"Sam", 24},
+		{"Gemima", 21}
+	};
+	display(account_users);
+	std::string name;
+	int age{};
+	std::cout << "\nEnter the name of another account_user: ";
+	getline(std::cin, name);
+	std::cout << "Enter their age: ";
+	std::cin >> age;
+	account_users.emplace_back(name, age);
+	display(account_users);
+	auto it = std::find(account_users.begin(), account_users.end(), Person{ "Sam", 24 });
+	if (it != account_users.end())
+		account_users.emplace(it, "Frank", 28);
+	display(account_users);
+}
+
+		//.sort()
+void test6() {
+	std::cout << "\n=====Test 6=====" << std::endl;
+	std::list<Person> account_users{
+		{"Jenny",19},
+		{"Sam", 24},
+		{"Gemima", 21}
+	};
+	display(account_users);  
+	account_users.sort();     //sorts by age
+	display(account_users);
+}
+
+int main()
+{
+	test1();
+	test2();
+	test3();
+	test4();
+	test5();
+	test6();
+	return 0;
+}
